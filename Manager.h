@@ -25,10 +25,10 @@ public:
 
 	void run(const char * command);
 	bool LOAD();
-	bool INSERT();
+	bool INSERT(int location, char * city, char * country);
 	bool PRINT_AVL();
-	bool SEARCH_AVL();
-	bool DELETE_AVL();
+	AVLNode * SEARCH_AVL(int num);
+	bool DELETE_AVL(int num);
 	bool BUILD_GP();
 	bool PRINT_GP();
 	bool BUILD_MST();

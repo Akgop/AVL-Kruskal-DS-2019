@@ -24,5 +24,4 @@ public:
 	void SetLeft(AVLNode * node);		// Set AVL Left Pointer
 	void SetRight(AVLNode * node);		// Set AVL Right Pointer
 	void SetmBF(int n);					// Set Balance Factor
-
 };

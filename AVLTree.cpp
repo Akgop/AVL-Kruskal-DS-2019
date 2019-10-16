@@ -3,6 +3,7 @@
 AVLTree::AVLTree(ofstream * flog)
 {
 	Setroot(NULL);
+	this->flog = flog;
 }
 
 AVLTree::~AVLTree()
@@ -153,21 +154,162 @@ bool AVLTree::Insert(CityData * node)
 	return true;
 }
 
-CityData * AVLTree::Delete(int num)
+bool AVLTree::Delete(int num)
 {
-	return NULL;
+	//
+	// #1. find target node to delete
+	//
+	AVLNode * pTemp = Search(num);
+	if (pTemp == NULL) return false;
+	char cTemp[50];
+	strcpy(cTemp, pTemp->GetCityData()->Getname());
+	stack<AVLNode *> s;
+	AVLNode * pCur = Getroot(), *pParent = NULL;
+
+	while (pCur && pCur != pTemp) {	//if pCur == pTemp, break
+		if (strcmp(cTemp, pCur->GetCityData()->Getname()) == -1) {	//cTemp < pCur->name
+			s.push(pCur);	//stack push
+			pParent = pCur;	//pP = p
+			pCur = pCur->GetLeft();	//p -> p->left
+		}
+		else if (strcmp(cTemp, pCur->GetCityData()->Getname()) == 1) {	//cTemp > pCur->name
+			s.push(pCur);	//stack push
+			pParent = pCur;	//pP = p
+			pCur = pCur->GetRight();	//p = p->right
+		}
+	}
+	//
+	// #2. Delete node
+	//
+	// #2-1. No mathing node
+	if (pCur == NULL) return false;
+	// #2-2. Leaf node
+	if (pCur->GetLeft() == NULL && pCur->GetRight() == NULL) {
+		if (pParent == NULL) {
+			Setroot(NULL); return true;
+		}
+		else if (pParent->GetLeft() == pCur)	pParent->SetLeft(NULL);
+		else if (pParent->GetRight() == pCur)	pParent->SetRight(NULL);
+		delete pCur;
+	}
+	// #2-3. Only right subtree
+	else if (pCur->GetLeft() == NULL) {
+		if (pParent == NULL)	Setroot(pCur->GetRight());
+		else if (pParent->GetLeft() == pCur)	pParent->SetLeft(pCur->GetRight());
+		else if (pParent->GetRight() == pCur)	pParent->SetRight(pCur->GetRight());
+		delete pCur;
+	}
+	// #2-4. Only left subtree
+	else if (pCur->GetRight() == NULL) {
+		if (pParent == NULL)	Setroot(pCur->GetLeft());
+		else if (pParent->GetLeft() == pCur)	pParent->SetLeft(pCur->GetLeft());
+		else if (pParent->GetRight() == pCur)	pParent->SetRight(pCur->GetLeft());
+		delete pCur;
+	}
+	// #2-5. both child node exist
+	else {
+		s.push(pCur);
+		AVLNode * pTarget = pCur->GetLeft(), *pTargetParent = pCur;
+		while (pTarget->GetRight()) {
+			s.push(pTarget);
+			pTargetParent = pTarget;
+			pTarget = pTarget->GetRight();
+		}
+		pCur->SetCityData(pTarget->GetCityData());
+		if (pTargetParent == pCur)	pTargetParent->SetLeft(pTarget->GetLeft());
+		else pTargetParent->SetRight(pTarget->GetLeft());
+		strcpy(cTemp, pTarget->GetCityData()->Getname());
+		delete pTarget;
+	}
+	//
+	// #3. Rebalance
+	//
+	// #3-1 Set A-Node
+	update_BF();
+	AVLNode * pA = NULL,
+		*pA_parent = NULL,
+		*rootSub = NULL;
+	bool balanced = true;
+	while (!s.empty()) {
+		pA = s.top();
+		s.pop();
+		if (pA->GetmBF() == 2 && pA->GetmBF() == -2) {
+			balanced = false;
+			break;
+		}
+	}
+	if (balanced) return true;	//if tree still balanced
+	if (!s.empty())	pA_parent = s.top();
+	// #3-2. set B-Node, C-Node
+	AVLNode * pB, *pC;
+	// #3-4. Tree Unbalnced, Rotate Subtree
+	if (pA->GetmBF() == 2) {	//if left imbalance
+		pB = pA->GetLeft();
+		// LL Rotation
+		if (pB->GetmBF() == 1) {
+			pA->SetLeft(pB->GetRight());	//a->left = b->right
+			pB->SetRight(pA);		//b->right = a
+			rootSub = pB;	//b is new root of the subtree
+		}
+		// LR Rotation
+		else {
+			pC = pB->GetRight();	//initial state
+			pB->SetRight(pC->GetLeft());	//b->right = c->left
+			pA->SetLeft(pC->GetRight());	//a->left = c->right
+			pC->SetLeft(pB);	//c->left = b
+			pC->SetRight(pA);	//c->right = a
+		}
+	}
+	else {	//if right imbalance
+		pB = pA->GetRight();
+		// RR Rotation
+		if (pB->GetmBF() == -1) {
+			pA->SetRight(pB->GetLeft());	//a->right = b->left
+			pB->SetLeft(pA);	//b->left = a
+			rootSub = pB;	//b is new root of subtree
+		}
+		// RL Rotation
+		else {
+			pC = pB->GetLeft();	//initial state
+			pB->SetLeft(pC->GetRight());	//b->left = c->right
+			pA->SetRight(pC->GetLeft());	//a->right = c->left
+			pC->SetRight(pB);	//c->right = b
+			pC->SetLeft(pA);	//c->left = a
+			rootSub = pC;	//pC is new root of subtree
+		}
+	}
+	// #3-5. Set child of Parent of A-Node to Subroot
+	if (pA_parent == NULL) this->root = rootSub;	//if pA was root, set rootSub as new root
+	else if (pA == pA_parent->GetLeft()) pA_parent->SetLeft(rootSub);	//if pA was leftchild, parent->left = rootSub
+	else pA_parent->SetRight(rootSub);	//if pA was rightchild, parent->right = rootSub
+	//
+	// #4. Update BF
+	//
+	update_BF();
+	return true;
 }
 
-CityData * AVLTree::Search(int num)
+AVLNode * AVLTree::Search(int num)
 {
-	return NULL;
+	//Level Order Search
+	//avl is height balanced, so I used level order
+	queue<AVLNode *> q;	//declare queue
+	AVLNode * pCur = Getroot();	//start from root
+	while (pCur) {
+		if (pCur->GetCityData()->GetLocationId() == num) {
+			return pCur;	//found node. return
+		}
+		if (pCur->GetLeft()) q.push(pCur->GetLeft());	//if left child exist, push left child to queue
+		if (pCur->GetRight()) q.push(pCur->GetRight());	//if right childe exist, push right child to queue
+		if (q.empty()) return NULL;	//cannot find, return null
+		pCur = q.front();	q.pop();	//pcur = q.front.
+	}
 }
 
 bool AVLTree::Print()
 {
 	AVLNode * pCur = this->root;
 	if (this->root != NULL) {
-		Inorder_Traversal(pCur);
 		return true;
 	}
 	else {
@@ -177,12 +319,43 @@ bool AVLTree::Print()
 
 void AVLTree::Inorder_Traversal(AVLNode * t)
 {
+	//used in-order traversal to print all node bottom to top.
 	if (t != NULL) {
 		Inorder_Traversal(t->GetLeft());
-		cout << "(" << t->GetCityData()->GetLocationId() << ", ";
-		cout << t->GetCityData()->Getname() << ", ";
-		cout << t->GetCityData()->Getcountry() << ")" << endl;
+		print_avl_node(t);
 		Inorder_Traversal(t->GetRight());
 	}
 	return;
+}
+
+void AVLTree::print_avl_node(AVLNode * t)
+{
+	//write data at log.txt
+	*flog << "(" << t->GetCityData()->GetLocationId() << ", ";
+	*flog << t->GetCityData()->Getname() << ", ";
+	*flog << t->GetCityData()->Getcountry() << ")" << endl;
+}
+
+int AVLTree::get_height(AVLNode * t)
+{
+	if (t == NULL) {
+		return 0;
+	}
+	return 1 + max(get_height(t->GetLeft()), get_height(t->GetRight()));
+}
+
+void AVLTree::update_BF()
+{
+	queue<AVLNode *> q;
+	AVLNode * pCur = Getroot();
+	int lh = 0, rh = 0;
+	while (pCur) {
+		lh = get_height(pCur->GetLeft());
+		rh = get_height(pCur->GetRight());
+		pCur->SetmBF(lh - rh);
+		if (pCur->GetLeft()) q.push(pCur->GetLeft());	//if left child exist, push left child to queue
+		if (pCur->GetRight()) q.push(pCur->GetRight());	//if right childe exist, push right child to queue
+		if (q.empty()) break;	//cannot find, return null
+		pCur = q.front();	q.pop();	//pcur = q.front.
+	}
 }

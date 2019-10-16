@@ -33,27 +33,46 @@ void Manager::run(const char * command)
 		char * one = strtok(cmd, " ");
 
 		if (!strcmp(one, "LOAD")) {
-			//call function()
-			//example. ( you have to change )
 			if (LOAD()) printSuccessCode("LOAD");
 			else printErrorCode(100, "LOAD");
 		}
 		else if (!strcmp(one, "INSERT")) {
-			//call function()
+			int location = atoi(strtok(NULL, " "));
+			char city[50], country[50];
+			strcpy(city, strtok(NULL, " "));
+			strcpy(country, strtok(NULL, " "));
+			if (INSERT(location, city, country)) {
+				flog << "==> command " << iter << ") " << "INSERT" << endl;
+				flog << "(" << location << ", ";
+				flog << city << ", ";
+				flog << country << ")" << endl;
+			}
+			else printErrorCode(200, "INSERT");
 		}
 		else if (!strcmp(one, "PRINT_AVL")) {
-			//call function()
-			if (PRINT_AVL()) printSuccessCode("PRINT_AVL");
+			if (PRINT_AVL()) {
+				flog << "==> command " << iter << ") " << "PRINT_AVL" << endl;
+				avl->Inorder_Traversal(avl->Getroot());
+			}
 			else printErrorCode(300, "PRINT_AVL");
 		}
 		else if (!strcmp(one, "SEARCH_AVL")) {
-			//call function()
+			int location = atoi(strtok(NULL, " "));
+			AVLNode * flag = NULL;
+			if (flag = SEARCH_AVL(location)) {
+				flog << "==> command " << iter << ") " << "SEARCH_AVL" << endl;
+				avl->print_avl_node(flag);
+			}
+			else printErrorCode(400, "SEARCH_AVL");
 		}
 		else if (!strcmp(one, "DELETE_AVL")) {
-			//call function()
+			int location = atoi(strtok(NULL, " "));
+			if (DELETE_AVL(location)) printSuccessCode("DELETE_AVL");
+			else printErrorCode(500, "DELETE_AVL");
 		}
 		else if (!strcmp(one, "BUILD_GP")) {
-			//call function()
+			if (BUILD_GP()) printSuccessCode("BUILD_GP");
+			else printErrorCode(700, "BUILD_GP");
 		}
 		else if (!strcmp(one, "PRINT_GP")) {
 			//call function()
@@ -103,29 +122,44 @@ bool Manager::LOAD()
 	return true;
 }
 
-bool Manager::INSERT()
+bool Manager::INSERT(int location, char* city, char* country)
 {
+	CityData * city_data = new CityData();	//allocate new CityData
+	city_data->SetLocationId(location);	//set elements
+	city_data->Setname(city);
+	city_data->Setcountry(country);
+	if (avl->Getroot() == NULL) {	//if empty tree
+		AVLNode * pNew = new AVLNode();	//new node as root
+		pNew->SetCityData(city_data);
+		avl->Setroot(pNew);
+	}
+	else {	//else, AVL_insert
+		avl->Insert(city_data);
+	}
 	return true;
 }
 
 bool Manager::PRINT_AVL()
 {
-	if (avl->Print()) return true;
+	if (avl->Print()) return true;	//call avl->Print function
 	else return false;
 }
 
-bool Manager::SEARCH_AVL()
+AVLNode * Manager::SEARCH_AVL(int num)
 {
-	return true;
+	if (avl->Search(num) != NULL) return avl->Search(num);
+	else return NULL;
 }
 
-bool Manager::DELETE_AVL()
+bool Manager::DELETE_AVL(int num)
 {
-	return true;
+	if (avl->Delete(num)) return true;
+	else return false;
 }
 
 bool Manager::BUILD_GP()
 {
+	gp->Build(avl);
 	return true;
 }
 

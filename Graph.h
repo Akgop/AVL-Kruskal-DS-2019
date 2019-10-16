@@ -21,6 +21,8 @@ public:
 	void 	Print_GP();
 	void	Print_MST();
 
+	void	Inorder_AVL(AVLNode * t);
+
 	/*for Kruskal union_set*/
 	bool	Kruskal();
 	void 	make_set();
