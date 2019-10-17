@@ -1,0 +1,53 @@
+==> command 1) LOAD
+Success
+==> command 2) PRINT_AVL
+(9821, Athens, Greece) BF : 0
+(7485, Busan, Korea) BF : -1
+(1241, Chicago, USA) BF : -1
+(8590, Hanoi, Vietnam) BF : 0
+(6542, LA, USA) BF : 0
+(4873, NewYork, USA) BF : 0
+(2354, Paris, France) BF : 0
+(5419, Roma, Italy) BF : 0
+(1543, Seoul, Korea) BF : 1
+(2132, Tokyo, Japan) BF : 0
+==> command 3) INSERT
+(5030, SaoPaulo, Brazil)
+==> command 4) PRINT_AVL
+(9821, Athens, Greece) BF : 0
+(7485, Busan, Korea) BF : -1
+(1241, Chicago, USA) BF : -1
+(8590, Hanoi, Vietnam) BF : 0
+(6542, LA, USA) BF : 0
+(4873, NewYork, USA) BF : 0
+(2354, Paris, France) BF : 1
+(5419, Roma, Italy) BF : 0
+(5030, SaoPaulo, Brazil) BF : 0
+(1543, Seoul, Korea) BF : 0
+(2132, Tokyo, Japan) BF : 0
+==> command 5) DELETE_AVL
+Success
+==> command 6) DELETE_AVL
+Success
+==> command 7) DELETE_AVL
+Success
+==> command 8) DELETE_AVL
+Success
+==> command 9) BUILD_GP
+Success
+==> command 10) PRINT_AVL
+(7485, Busan, Korea) BF : 0
+(6542, LA, USA) BF : -1
+(4873, NewYork, USA) BF : 0
+(2354, Paris, France) BF : 1
+(5419, Roma, Italy) BF : 1
+(1543, Seoul, Korea) BF : -1
+(2132, Tokyo, Japan) BF : 0
+==> command 11) PRINT_GP
+0	943	2612	5131	2066	5942	5353	
+943	0	1669	4188	1123	4999	4410	
+2612	1669	0	2519	546	3330	2741	
+5131	4188	2519	0	3065	811	222	
+2066	1123	546	3065	0	3876	3287	
+5942	4999	3330	811	3876	0	589	
+5353	4410	2741	222	3287	589	0

@@ -38,30 +38,27 @@ bool Graph::Build(AVLTree * root)
 			}
 		}
 	}
-	/*
-	map<int, CityData*>::iterator it;
-	for (int i = 0; i < Get_AVL_Size(); i++) {
-		for (it = mList[i].begin(); it != mList[i].end(); it++) {
-			cout << "(" << it->first << "," << it->second->Getname() << ")" << endl;
-		}
-	}
-	*/
 	return true;
 }
 
 void Graph::Print_GP()
 {
 	map<int, CityData*> *m = this->mList;
-	map<int, CityData*>::iterator it;
-	int cnt;
-	for (int i = 0; i < Get_AVL_Size(); i++) {
+	map<int, CityData*>::iterator it;	//map iterator 
+	int cnt, dist = 0;	//cnt for count iterator
+	for (int i = 0; i < Get_AVL_Size(); i++) {	//mList[i][cnt]
 		cnt = 0;
-		for (it = m[i].begin(); it != m[i].end(); it++) {
-			if (i == cnt) cout << "0 ";
+		for (it = m[i].begin(); it != m[i].end();) {
+			if (i == cnt) *flog << "0\t";	//node itself
 			else {
-				Get_Distance(this->vertex[i], *it->second);
+				dist = Get_Distance(this->vertex[i], *it->second);	//get distance
+				*flog << dist << "\t";
+				it++;
 			}
+			cnt++;
 		}
+		if (i == Get_AVL_Size() - 1) *flog << "0";
+		*flog << endl;
 	}
 }
 
@@ -101,28 +98,44 @@ void Graph::Inorder_AVL(AVLNode * t, CityData * c, int &cnt)
 	}
 }
 
+//Get distance from two City
 int Graph::Get_Distance(CityData from, CityData to)
 {
-	if (from.GetLocationId() > to.GetLocationId())
-		return from.GetLocationId() - to.GetLocationId();
-	else if (from.GetLocationId() < to.GetLocationId())
-		return to.GetLocationId() - from.GetLocationId();
-	else return 0;
+	if (from.GetLocationId() > to.GetLocationId())	//from > to
+		return from.GetLocationId() - to.GetLocationId();	//from - to
+	else if (from.GetLocationId() < to.GetLocationId())	//to > from
+		return to.GetLocationId() - from.GetLocationId();	//to - from
+	else return 0;	//node itself = 0
 }
 
 bool Graph::Kruskal()
 {
+	
 	return false;
 }
 
 void Graph::make_set()
 {
+	this->root = new int[Get_AVL_Size()];
+	for (int i = 0; i < Get_AVL_Size(); i++) {
+		this->root[i] = i;
+	}
 }
 
 void Graph::union_set(int x, int y)
 {
+	x = find(x);
+	y = find(y);
+
+	root[y] = x;
 }
 
-void Graph::find(int x)
+int Graph::find(int x)
 {
+	if (root[x] == x) {
+		return x;
+	}
+	else {
+		return find(root[x]);
+	}
 }

@@ -72,10 +72,14 @@ void Manager::run(const char * command)
 		}
 		else if (!strcmp(one, "BUILD_GP")) {
 			if (BUILD_GP()) printSuccessCode("BUILD_GP");
-			else printErrorCode(700, "BUILD_GP");
+			else printErrorCode(600, "BUILD_GP");
 		}
 		else if (!strcmp(one, "PRINT_GP")) {
-			//call function()
+			if (PRINT_GP()) {
+				flog << "==> command " << iter << ") " << "PRINT_GP" << endl;
+				gp->Print_GP();
+			}
+			else printErrorCode(700, "PRINT_GP");
 		}
 		else if (!strcmp(one, "BUILD_MST")) {
 			//call function()
@@ -165,7 +169,8 @@ bool Manager::BUILD_GP()
 
 bool Manager::PRINT_GP()
 {
-	return true;
+	if (gp->mList != NULL) return true;
+	else return false;
 }
 
 bool Manager::BUILD_MST()

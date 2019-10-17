@@ -11,6 +11,9 @@ public:
 	int size;					// AVLTree size
 	int * mstMatrix;			// MST
 
+	/*union set*/
+	int * root;				//root info
+
 	ofstream * flog;
 
 public:
@@ -30,7 +33,7 @@ public:
 	bool	Kruskal();
 	void 	make_set();
 	void 	union_set(int x, int y);
-	void	find(int x);
+	int		find(int x);
 
 };
 
