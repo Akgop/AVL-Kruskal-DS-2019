@@ -159,8 +159,8 @@ bool Manager::DELETE_AVL(int num)
 
 bool Manager::BUILD_GP()
 {
-	gp->Build(avl);
-	return true;
+	if (gp->Build(avl)) return true;
+	else return false;
 }
 
 bool Manager::PRINT_GP()

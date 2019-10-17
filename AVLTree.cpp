@@ -163,92 +163,95 @@ bool AVLTree::Delete(int num)
 	if (pTemp == NULL) return false;
 	char cTemp[50];
 	strcpy(cTemp, pTemp->GetCityData()->Getname());
-	stack<AVLNode *> s;
 	AVLNode * pCur = Getroot(), *pParent = NULL;
-
-	while (pCur && pCur != pTemp) {	//if pCur == pTemp, break
-		if (strcmp(cTemp, pCur->GetCityData()->Getname()) == -1) {	//cTemp < pCur->name
-			s.push(pCur);	//stack push
-			pParent = pCur;	//pP = p
-			pCur = pCur->GetLeft();	//p -> p->left
+	while (pCur) {
+		if (pCur == pTemp) {
+			break;
 		}
-		else if (strcmp(cTemp, pCur->GetCityData()->Getname()) == 1) {	//cTemp > pCur->name
-			s.push(pCur);	//stack push
-			pParent = pCur;	//pP = p
-			pCur = pCur->GetRight();	//p = p->right
+		pParent = pCur;
+		if (strcmp(cTemp, pCur->GetCityData()->Getname()) == 1) {
+			pCur = pCur->GetRight();
 		}
+		else pCur = pCur->GetLeft();
 	}
 	//
-	// #2. Delete node
+	// #2. delete node
 	//
-	// #2-1. No mathing node
+	// #2-1. no node
 	if (pCur == NULL) return false;
-	// #2-2. Leaf node
-	if (pCur->GetLeft() == NULL && pCur->GetRight() == NULL) {
-		if (pParent == NULL) {
-			Setroot(NULL); return true;
-		}
+	// #2-2. leaf node
+	if (pCur->GetLeft() == NULL || pCur->GetRight() == NULL) {
+		if (pParent == NULL)	Setroot(NULL);
 		else if (pParent->GetLeft() == pCur)	pParent->SetLeft(NULL);
-		else if (pParent->GetRight() == pCur)	pParent->SetRight(NULL);
+		else pParent->SetRight(NULL);
 		delete pCur;
 	}
-	// #2-3. Only right subtree
+	// #2-3. only right subtree
 	else if (pCur->GetLeft() == NULL) {
 		if (pParent == NULL)	Setroot(pCur->GetRight());
-		else if (pParent->GetLeft() == pCur)	pParent->SetLeft(pCur->GetRight());
-		else if (pParent->GetRight() == pCur)	pParent->SetRight(pCur->GetRight());
+		else if (pParent->GetLeft() == pCur) pParent->SetLeft(pCur->GetRight());
+		else pParent->SetRight(pCur->GetRight());
 		delete pCur;
 	}
-	// #2-4. Only left subtree
+	// #2-4. only left subtree
 	else if (pCur->GetRight() == NULL) {
 		if (pParent == NULL)	Setroot(pCur->GetLeft());
-		else if (pParent->GetLeft() == pCur)	pParent->SetLeft(pCur->GetLeft());
-		else if (pParent->GetRight() == pCur)	pParent->SetRight(pCur->GetLeft());
+		else if (pParent->GetLeft() == pCur) pParent->SetLeft(pCur->GetLeft());
+		else pParent->SetRight(pCur->GetLeft());
 		delete pCur;
 	}
-	// #2-5. both child node exist
+	// #2-5. both subtree
 	else {
-		s.push(pCur);
 		AVLNode * pTarget = pCur->GetLeft(), *pTargetParent = pCur;
 		while (pTarget->GetRight()) {
-			s.push(pTarget);
 			pTargetParent = pTarget;
 			pTarget = pTarget->GetRight();
 		}
 		pCur->SetCityData(pTarget->GetCityData());
-		if (pTargetParent == pCur)	pTargetParent->SetLeft(pTarget->GetLeft());
+		if (pTargetParent == pCur)
+			pTargetParent->SetLeft(pTarget->GetLeft());
 		else pTargetParent->SetRight(pTarget->GetLeft());
-		strcpy(cTemp, pTarget->GetCityData()->Getname());
 		delete pTarget;
 	}
 	//
 	// #3. Rebalance
 	//
-	// #3-1 Set A-Node
-	update_BF();
-	AVLNode * pA = NULL,
-		*pA_parent = NULL,
-		*rootSub = NULL;
-	bool balanced = true;
-	while (!s.empty()) {
-		pA = s.top();
-		s.pop();
-		if (pA->GetmBF() == 2 && pA->GetmBF() == -2) {
-			balanced = false;
+	// #3-1. update BF
+	update_BF();	//update balance factor
+	queue<AVLNode *> q;
+	pCur = Getroot();
+	while (pCur) {
+		if (pCur->GetmBF() == 2 || pCur->GetmBF() == -2) {
 			break;
 		}
+		if (pCur->GetLeft()) q.push(pCur->GetLeft());	//if left child exist, push left child to queue
+		if (pCur->GetRight()) q.push(pCur->GetRight());	//if right childe exist, push right child to queue
+		if (q.empty()) return true;	//tree still balanced
+		pCur = q.front();	q.pop();	//pcur = q.front.
 	}
-	if (balanced) return true;	//if tree still balanced
-	if (!s.empty())	pA_parent = s.top();
-	// #3-2. set B-Node, C-Node
-	AVLNode * pB, *pC;
-	// #3-4. Tree Unbalnced, Rotate Subtree
-	if (pA->GetmBF() == 2) {	//if left imbalance
+	// #3-2. Set A-Node, parent of A-Node
+	AVLNode *pA = pCur, *pB, *pC, *pA_parent = NULL, *rootSub = NULL;
+	if (pA != Getroot()) {
+		pA_parent = Getroot();
+		while (pA_parent) {
+			if (pA_parent->GetLeft() == pA ||
+				pA_parent->GetRight() == pA) {
+				break;
+			}
+			if (strcmp(pA->GetCityData()->Getname(), pA_parent->GetCityData()->Getname()) == 1) {
+				pA_parent = pA_parent->GetRight();
+			}
+			else pA_parent = pA_parent->GetLeft();
+		}
+	}
+	// #3-3. Left imbalanced
+	if (pA->GetmBF() == 2) {
 		pB = pA->GetLeft();
 		// LL Rotation
-		if (pB->GetmBF() == 1) {
+		if (pB->GetmBF() >= 0) {
 			pA->SetLeft(pB->GetRight());	//a->left = b->right
 			pB->SetRight(pA);		//b->right = a
+			pA->SetmBF(0);	pB->SetmBF(0);	//update bf
 			rootSub = pB;	//b is new root of the subtree
 		}
 		// LR Rotation
@@ -258,14 +261,16 @@ bool AVLTree::Delete(int num)
 			pA->SetLeft(pC->GetRight());	//a->left = c->right
 			pC->SetLeft(pB);	//c->left = b
 			pC->SetRight(pA);	//c->right = a
+			rootSub = pC;
 		}
 	}
-	else {	//if right imbalance
+	else if (pA->GetmBF() == -2) {
 		pB = pA->GetRight();
 		// RR Rotation
-		if (pB->GetmBF() == -1) {
+		if (pB->GetmBF() <= 0) {
 			pA->SetRight(pB->GetLeft());	//a->right = b->left
 			pB->SetLeft(pA);	//b->left = a
+			pA->SetmBF(0);	pB->SetmBF(0);	//update balance factor
 			rootSub = pB;	//b is new root of subtree
 		}
 		// RL Rotation
@@ -275,16 +280,12 @@ bool AVLTree::Delete(int num)
 			pA->SetRight(pC->GetLeft());	//a->right = c->left
 			pC->SetRight(pB);	//c->right = b
 			pC->SetLeft(pA);	//c->left = a
-			rootSub = pC;	//pC is new root of subtree
+			rootSub = pC;
 		}
 	}
-	// #3-5. Set child of Parent of A-Node to Subroot
 	if (pA_parent == NULL) this->root = rootSub;	//if pA was root, set rootSub as new root
 	else if (pA == pA_parent->GetLeft()) pA_parent->SetLeft(rootSub);	//if pA was leftchild, parent->left = rootSub
 	else pA_parent->SetRight(rootSub);	//if pA was rightchild, parent->right = rootSub
-	//
-	// #4. Update BF
-	//
 	update_BF();
 	return true;
 }
@@ -331,9 +332,11 @@ void AVLTree::Inorder_Traversal(AVLNode * t)
 void AVLTree::print_avl_node(AVLNode * t)
 {
 	//write data at log.txt
-	*flog << "(" << t->GetCityData()->GetLocationId() << ", ";
-	*flog << t->GetCityData()->Getname() << ", ";
-	*flog << t->GetCityData()->Getcountry() << ")" << endl;
+	*flog << "(" << t->GetCityData()->GetLocationId() << ", "
+		<< t->GetCityData()->Getname() << ", "
+		<< t->GetCityData()->Getcountry() << ")"
+		<< " BF : "
+		<< t->GetmBF() << endl;
 }
 
 int AVLTree::get_height(AVLNode * t)

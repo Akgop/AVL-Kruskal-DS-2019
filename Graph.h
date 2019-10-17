@@ -6,7 +6,7 @@ using namespace std;
 class Graph
 {
 public:
-	map<int, CityData *> mList;	// mList[from vetex] = map<to vertex, weigth>
+	map<int, CityData *> * mList;	// mList[from vetex] = map<to vertex, weight>
 	CityData * vertex;			// vetex[index] = CityData * 
 	int size;					// AVLTree size
 	int * mstMatrix;			// MST
@@ -21,7 +21,7 @@ public:
 	void 	Print_GP();
 	void	Print_MST();
 
-	void	Inorder_AVL(AVLNode * t);
+	void	Inorder_AVL(AVLNode * t, vector<AVLNode *> v);
 
 	/*for Kruskal union_set*/
 	bool	Kruskal();
