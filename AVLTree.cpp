@@ -180,7 +180,7 @@ bool AVLTree::Delete(int num)
 	// #2-1. no node
 	if (pCur == NULL) return false;
 	// #2-2. leaf node
-	if (pCur->GetLeft() == NULL || pCur->GetRight() == NULL) {
+	if (pCur->GetLeft() == NULL && pCur->GetRight() == NULL) {
 		if (pParent == NULL)	Setroot(NULL);
 		else if (pParent->GetLeft() == pCur)	pParent->SetLeft(NULL);
 		else pParent->SetRight(NULL);

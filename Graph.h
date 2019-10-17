@@ -21,7 +21,10 @@ public:
 	void 	Print_GP();
 	void	Print_MST();
 
-	void	Inorder_AVL(AVLNode * t, vector<AVLNode *> v);
+	void	Set_AVL_Size(AVLTree * root);
+	int		Get_AVL_Size();
+	void	Inorder_AVL(AVLNode * t, CityData * c, int &cnt);
+	int		Get_Distance(CityData from, CityData to);
 
 	/*for Kruskal union_set*/
 	bool	Kruskal();
