@@ -5,6 +5,7 @@ Graph::Graph(ofstream * flog)
 {
 	this->flog = flog;
 	this->mList = NULL;
+	this->mstMatrix = NULL;
 }
 
 Graph::~Graph()
@@ -25,16 +26,18 @@ bool Graph::Build(AVLTree * root)
 		this->mList = NULL;
 	}
 	this->mList = new map<int, CityData *>[Get_AVL_Size()];
-	this->vertex = new CityData[Get_AVL_Size()];
+	this->vertex = new CityData* [Get_AVL_Size()];
 
 	// #3. make Graph
-	AVLNode * pCur = root->Getroot(); 
-	int cnt = 0;
+	AVLNode * pCur = root->Getroot();
+	int cnt = 0, dist = 0;
+	pair<int, CityData*> p;
+	CityData * pNew = new CityData;
 	Inorder_AVL(pCur, vertex, cnt);
 	for (int i = 0; i < Get_AVL_Size(); i++) {	//from node
 		for (int j = 0; j < Get_AVL_Size(); j++) {	//to node
 			if (i != j) {	//except node to node itself
-				this->mList[i].insert(make_pair(j, &vertex[j]));	//insert Citydata to map
+				this->mList[i].insert(make_pair(j, vertex[j]));	//insert Citydata to map
 			}
 		}
 	}
@@ -51,7 +54,7 @@ void Graph::Print_GP()
 		for (it = m[i].begin(); it != m[i].end();) {
 			if (i == cnt) *flog << "0\t";	//node itself
 			else {
-				dist = Get_Distance(this->vertex[i], *it->second);	//get distance
+				dist = Get_Distance(this->vertex[i], it->second);	//get distance
 				*flog << dist << "\t";
 				it++;
 			}
@@ -60,10 +63,19 @@ void Graph::Print_GP()
 		if (i == Get_AVL_Size() - 1) *flog << "0";
 		*flog << endl;
 	}
+
 }
 
 void Graph::Print_MST()
 {
+	int sum = 0;
+	for (int i = 0; i < Get_AVL_Size() - 1; i++) {
+		*flog << "(" << this->vertex[this->mstMatrix[i].second.first]->Getname()
+			<< ", " << this->vertex[this->mstMatrix[i].second.second]->Getname()
+			<< "), " << this->mstMatrix[i].first << endl;
+		sum += this->mstMatrix[i].first;
+	}
+	*flog << "ToTal:" << sum << endl;
 }
 
 int Graph::Get_AVL_Size()
@@ -86,31 +98,57 @@ void Graph::Set_AVL_Size(AVLTree * root)
 	this->size = count;
 }
 
-void Graph::Inorder_AVL(AVLNode * t, CityData * c, int &cnt)
+void Graph::Inorder_AVL(AVLNode * t, CityData ** c, int &cnt)
 {
 	if (t != NULL) {
 		Inorder_AVL(t->GetLeft(), c, cnt);
-		c[cnt].Setcountry(t->GetCityData()->Getcountry());
-		c[cnt].SetLocationId(t->GetCityData()->GetLocationId());
-		c[cnt].Setname(t->GetCityData()->Getname());
+		c[cnt] = t->GetCityData();
 		cnt++;
 		Inorder_AVL(t->GetRight(), c, cnt);
 	}
 }
 
 //Get distance from two City
-int Graph::Get_Distance(CityData from, CityData to)
+int Graph::Get_Distance(CityData *from, CityData* to)
 {
-	if (from.GetLocationId() > to.GetLocationId())	//from > to
-		return from.GetLocationId() - to.GetLocationId();	//from - to
-	else if (from.GetLocationId() < to.GetLocationId())	//to > from
-		return to.GetLocationId() - from.GetLocationId();	//to - from
+	if (from->GetLocationId() > to->GetLocationId())	//from > to
+		return from->GetLocationId() - to->GetLocationId();	//from - to
+	else if (from->GetLocationId() < to->GetLocationId())	//to > from
+		return to->GetLocationId() - from->GetLocationId();	//to - from
 	else return 0;	//node itself = 0
+}
+
+//for kruskal algorithm.
+void Graph::Ascending_Edges()
+{
+	int cnt = 0;
+	for (int i = 0; i < Get_AVL_Size(); i++) {
+		for (int j = i; j < Get_AVL_Size(); j++) {
+			if (i != j) {
+				edge.push_back(make_pair(Get_Distance(vertex[i], vertex[j]), make_pair(i, j)));
+				cnt++;
+			}
+		}
+	}
+	sort(edge.begin(), edge.end());
 }
 
 bool Graph::Kruskal()
 {
-	
+	make_set();
+	Ascending_Edges();
+	mstMatrix = new pair<int, pair<int, int>>[Get_AVL_Size() - 1];
+	int cnt = 0;
+	int size = (Get_AVL_Size() * (Get_AVL_Size() - 1)) / 2;
+	if (size == 0) return false;
+	for (int i = 0; i < size; i++) {
+		if (find(this->edge[i].second.first) != find(this->edge[i].second.second)) {	//not a cyclic path
+			union_set(this->edge[i].second.first, this->edge[i].second.second);
+			mstMatrix[cnt] = this->edge[i];
+			cnt++;
+		}
+		else { continue; }	//cyclic path occurs
+	}
 	return false;
 }
 
