@@ -44,9 +44,9 @@ void Manager::run(const char * command)
 			strcpy(country, strtok(NULL, " "));	//country
 			if (INSERT(location, city, country)) {	//call insert function
 				flog << "==> command " << iter << ") " << one << endl;
-				flog << "(" << location << ", ";
-				flog << city << ", ";
-				flog << country << ")" << endl;
+				flog << "( " << location << ", "
+					<< city << ", "
+					<< country << " )" << endl;
 			}
 			else printErrorCode(200, one);
 			flog << endl;

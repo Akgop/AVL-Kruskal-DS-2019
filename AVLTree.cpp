@@ -37,11 +37,11 @@ bool AVLTree::Insert(CityData * node)
 		if (pCur->GetmBF() != 0) {	//if mBF = +- 1
 			pA = pCur;	pA_parent = pCur_parent;
 		}
-		if (strcmp(node->Getname(),pCur->GetCityData()->Getname()) == -1) {	//take left branch
+		if (strcmp(node->Getname(),pCur->GetCityData()->Getname()) < 0) {	//take left branch
 			pCur_parent = pCur;
 			pCur = pCur->GetLeft();
 		}
-		else if (strcmp(node->Getname(), pCur->GetCityData()->Getname()) == 1) {	//else take right branch
+		else if (strcmp(node->Getname(), pCur->GetCityData()->Getname()) > 0) {	//else take right branch
 			pCur_parent = pCur;
 			pCur = pCur->GetRight();
 		}
@@ -52,7 +52,7 @@ bool AVLTree::Insert(CityData * node)
 	//
 	// #2. Insert pNew
 	//
-	if (strcmp(node->Getname(), pCur_parent->GetCityData()->Getname()) == -1) {
+	if (strcmp(node->Getname(), pCur_parent->GetCityData()->Getname()) < 0) {
 		pCur_parent->SetLeft(pNew);
 	}
 	else pCur_parent->SetRight(pNew);
@@ -62,7 +62,7 @@ bool AVLTree::Insert(CityData * node)
 	// #3-1) set B-node, C-node
 	int d = 1;
 	AVLNode * pB, *pC; //pB = child of pA, pC = child of pB
-	if (strcmp(node->Getname(), pA->GetCityData()->Getname()) == 1) {	//if new node inserted at right
+	if (strcmp(node->Getname(), pA->GetCityData()->Getname()) > 0) {	//if new node inserted at right
 		pB = pCur = pA->GetRight();	//pB = pA->right, pCur = pA->right
 		d = -1;	//l - r = -1
 	}
@@ -73,7 +73,7 @@ bool AVLTree::Insert(CityData * node)
 
 	// #3-2) update balance factor
 	while (pCur != pNew) {	//stop loop at pCur == pNew
-		if (strcmp(node->Getname(), pCur->GetCityData()->Getname()) == 1) {	//right added
+		if (strcmp(node->Getname(), pCur->GetCityData()->Getname()) > 0) {	//right added
 			pCur->SetmBF(-1);	pCur = pCur->GetRight();	//height of right increases by 1
 		}
 		else {	//left added
@@ -169,7 +169,7 @@ bool AVLTree::Delete(int num)
 			break;
 		}
 		pParent = pCur;
-		if (strcmp(cTemp, pCur->GetCityData()->Getname()) == 1) {
+		if (strcmp(cTemp, pCur->GetCityData()->Getname()) > 0) {
 			pCur = pCur->GetRight();
 		}
 		else pCur = pCur->GetLeft();
@@ -238,7 +238,7 @@ bool AVLTree::Delete(int num)
 				pA_parent->GetRight() == pA) {
 				break;
 			}
-			if (strcmp(pA->GetCityData()->Getname(), pA_parent->GetCityData()->Getname()) == 1) {
+			if (strcmp(pA->GetCityData()->Getname(), pA_parent->GetCityData()->Getname()) > 0) {
 				pA_parent = pA_parent->GetRight();
 			}
 			else pA_parent = pA_parent->GetLeft();
@@ -332,9 +332,9 @@ void AVLTree::Inorder_Traversal(AVLNode * t)
 void AVLTree::print_avl_node(AVLNode * t)
 {
 	//write data at log.txt
-	*flog << "(" << t->GetCityData()->GetLocationId() << ", "
+	*flog << "( " << t->GetCityData()->GetLocationId() << ", "
 		<< t->GetCityData()->Getname() << ", "
-		<< t->GetCityData()->Getcountry() << ")"
+		<< t->GetCityData()->Getcountry() << " )"
 		<< " BF : "
 		<< t->GetmBF() << endl;
 }

@@ -1,11 +1,14 @@
 #include "Graph.h"
 #include <map>
-
+#include <iomanip>
 Graph::Graph(ofstream * flog)
 {
 	this->flog = flog;
 	this->mList = NULL;
 	this->mstMatrix = NULL;
+	this->vertex = NULL;
+	this->edge.clear();
+	this->root = NULL;
 }
 
 Graph::~Graph()
@@ -14,16 +17,22 @@ Graph::~Graph()
 
 bool Graph::Build(AVLTree * root)
 {
+	// #0. Special case - If Graph already exists
+	if (this->mList != NULL) {	//De-allocate graph and mst
+		delete[] this->mList;
+		delete[] this->vertex;
+		delete[] this->root;
+		this->mList = NULL;
+		this->vertex = NULL;
+		this->edge.clear();
+		this->root = NULL;
+	}
 	// #1. Set AVL Tree size
 	Set_AVL_Size(root);
 	
 	// #2. Allocate Maps
 	if (Get_AVL_Size() == 0) {	//if empty tree
 		return false;
-	}
-	if (this->mList != NULL) {	//if mList declared before
-		delete[] mList;
-		this->mList = NULL;
 	}
 	this->mList = new map<int, CityData *>[Get_AVL_Size()];
 	this->vertex = new CityData* [Get_AVL_Size()];
@@ -49,13 +58,14 @@ void Graph::Print_GP()
 	map<int, CityData*> *m = this->mList;
 	map<int, CityData*>::iterator it;	//map iterator 
 	int cnt, dist = 0;	//cnt for count iterator
+	flog->setf(ios::left);
 	for (int i = 0; i < Get_AVL_Size(); i++) {	//mList[i][cnt]
 		cnt = 0;
 		for (it = m[i].begin(); it != m[i].end();) {
-			if (i == cnt) *flog << "0\t";	//node itself
+			if (i == cnt) *flog << setw(6) << "0";	//node itself
 			else {
 				dist = Get_Distance(this->vertex[i], it->second);	//get distance
-				*flog << dist << "\t";
+				*flog << setw(6) << dist;
 				it++;
 			}
 			cnt++;
@@ -70,12 +80,12 @@ void Graph::Print_MST()
 {
 	int sum = 0;
 	for (int i = 0; i < Get_AVL_Size() - 1; i++) {
-		*flog << "(" << this->vertex[this->mstMatrix[i].second.first]->Getname()
+		*flog << "( " << this->vertex[this->mstMatrix[i].second.first]->Getname()
 			<< ", " << this->vertex[this->mstMatrix[i].second.second]->Getname()
-			<< "), " << this->mstMatrix[i].first << endl;
+			<< " ), " << this->mstMatrix[i].first << endl;
 		sum += this->mstMatrix[i].first;
 	}
-	*flog << "ToTal:" << sum << endl;
+	*flog << "Total: " << sum << endl;
 }
 
 int Graph::Get_AVL_Size()
@@ -149,7 +159,7 @@ bool Graph::Kruskal()
 		}
 		else { continue; }	//cyclic path occurs
 	}
-	return false;
+	return true;
 }
 
 void Graph::make_set()
