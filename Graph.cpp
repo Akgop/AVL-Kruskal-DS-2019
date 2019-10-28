@@ -78,14 +78,9 @@ void Graph::Print_GP()
 
 void Graph::Print_MST()
 {
-	int sum = 0;
-	for (int i = 0; i < Get_AVL_Size() - 1; i++) {
-		*flog << "( " << this->vertex[this->mstMatrix[i].second.first]->Getname()
-			<< ", " << this->vertex[this->mstMatrix[i].second.second]->Getname()
-			<< " ), " << this->mstMatrix[i].first << endl;
-		sum += this->mstMatrix[i].first;
+	if (Get_AVL_Size() != 1) {
+		this->find_path_mst();
 	}
-	*flog << "Total: " << sum << endl;
 }
 
 int Graph::Get_AVL_Size()
@@ -128,6 +123,62 @@ int Graph::Get_Distance(CityData *from, CityData* to)
 	else return 0;	//node itself = 0
 }
 
+void Graph::find_path_mst()
+{
+	int start_vertex, cur_vertex;
+	int * cnt = new int[Get_AVL_Size()];
+	bool * visited = new bool[Get_AVL_Size() - 1];
+	cnt[0] = 0;
+	for (int i = 0; i < Get_AVL_Size() - 1; i++) {
+		cnt[i + 1] = 0;
+		visited[i] = true;
+	}
+	for (int i = 0; i < Get_AVL_Size() - 1; i++) {
+		cnt[this->mstMatrix[i].second.first] ++;
+		cnt[this->mstMatrix[i].second.second] ++;
+	}
+	for (int i = 0; i < Get_AVL_Size(); i++) {
+		if (cnt[i] == 1) {
+			start_vertex = i;
+			break;
+		}
+	}
+	int sum = 0;
+	cur_vertex = start_vertex;
+	for (int j = 0; j < Get_AVL_Size() - 1; j++) {
+		for (int i = 0; i < Get_AVL_Size() - 1; i++) {	//find vertex
+			if (visited[i]) {
+				if (cur_vertex == this->mstMatrix[i].second.first) {
+					*flog << "( " << this->vertex[this->mstMatrix[i].second.first]->Getname()
+						<< ", " << this->vertex[this->mstMatrix[i].second.second]->Getname()
+						<< " ), " << this->mstMatrix[i].first << endl;
+					visited[i] = false;
+					cur_vertex = this->mstMatrix[i].second.second;
+					sum += this->mstMatrix[i].first;
+					break;
+				}
+				else if (cur_vertex == this->mstMatrix[i].second.second) {
+					*flog << "( " << this->vertex[this->mstMatrix[i].second.second]->Getname()
+						<< ", " << this->vertex[this->mstMatrix[i].second.first]->Getname()
+						<< " ), " << this->mstMatrix[i].first << endl;
+					visited[i] = false;
+					cur_vertex = this->mstMatrix[i].second.first;
+					sum += this->mstMatrix[i].first;
+					break;
+				}
+				else {
+					continue;
+				}
+			}
+		}
+	}
+	*flog << "Total: " << sum << endl;
+	delete[] cnt;
+	delete[] visited;
+}
+
+
+
 //for kruskal algorithm.
 void Graph::Ascending_Edges()
 {
@@ -145,12 +196,13 @@ void Graph::Ascending_Edges()
 
 bool Graph::Kruskal()
 {
+	if (Get_AVL_Size() == 0) return false;
+	if (Get_AVL_Size() == 1) return false;
 	make_set();
 	Ascending_Edges();
 	mstMatrix = new pair<int, pair<int, int>>[Get_AVL_Size() - 1];
 	int cnt = 0;
 	int size = (Get_AVL_Size() * (Get_AVL_Size() - 1)) / 2;
-	if (size == 0) return false;
 	for (int i = 0; i < size; i++) {
 		if (find(this->edge[i].second.first) != find(this->edge[i].second.second)) {	//not a cyclic path
 			union_set(this->edge[i].second.first, this->edge[i].second.second);

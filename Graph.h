@@ -30,6 +30,7 @@ public:
 	void	Inorder_AVL(AVLNode * t, CityData ** c, int &cnt);
 	int		Get_Distance(CityData* from, CityData* to);
 
+	void	find_path_mst();
 	void	Ascending_Edges();
 
 	/*for Kruskal union_set*/
