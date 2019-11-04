@@ -3,9 +3,9 @@
 #include <fstream>
 using namespace std;
 
-Manager::Manager()
+Manager::Manager()	//constructor
 {
-	flog.open("log.txt", ios::app);
+	flog.open("log.txt", ios::app);	//for log.txt
 	flog.setf(ios::fixed);
 
 	avl = new AVLTree(&flog);
@@ -14,19 +14,19 @@ Manager::Manager()
 	cmd = NULL;
 }
 
-Manager::~Manager()
+Manager::~Manager()	//destructor
 {
 	flog.close();
 }
 
-void Manager::run(const char * command)
+void Manager::run(const char * command)	//driver
 {
 	fin.open(command);	//open command.txt
 
 	cmd = new char[40];	//cmd = command Text
 
 
-	while (!fin.eof())
+	while (!fin.eof())	//read command file
 	{
 		iter = iter + 1;
 		fin.getline(cmd, 40);	//read file
@@ -34,7 +34,7 @@ void Manager::run(const char * command)
 
 		if (!strcmp(one, "LOAD")) {	//if command is LOAD
 			if (LOAD()) printSuccessCode(one);	//call LOAD function
-			else printErrorCode(100, one);
+			else printErrorCode(100, one);	//print error 100
 			flog << endl;
 		}
 		else if (!strcmp(one, "INSERT")) {	//if command is INSERT
@@ -48,55 +48,96 @@ void Manager::run(const char * command)
 					<< city << ", "
 					<< country << " )" << endl;
 			}
-			else printErrorCode(200, one);
+			else printErrorCode(200, one);	//print error 200
 			flog << endl;
 		}
 		else if (!strcmp(one, "PRINT_AVL")) {	//if command is PRINT_AVL
-			if (PRINT_AVL()) {	//call PRINT_AVL function
-				flog << "==> command " << iter << ") " << one << endl;
-				avl->Inorder_Traversal(avl->Getroot());	//call real print function
+			char * err = strtok(NULL, " ");
+			if (!err) {
+				if (PRINT_AVL()) {	//call PRINT_AVL function
+					flog << "==> command " << iter << ") " << one << endl;
+					avl->Inorder_Traversal(avl->Getroot());	//call real print function
+				}
+				else printErrorCode(300, one);	//print error 300
+				flog << endl;
 			}
-			else printErrorCode(300, one);
+			else printErrorCode(300, one);	//print error 300
 			flog << endl;
 		}
 		else if (!strcmp(one, "SEARCH_AVL")) {	//if command is SEARCH_AVL
-			int location = atoi(strtok(NULL, " "));	//location id
-			AVLNode * flag = NULL;
-			if (flag = SEARCH_AVL(location)) {	//get node
-				flog << "==> command " << iter << ") " << one << endl;
-				avl->print_avl_node(flag);	//print node
+			char * location = strtok(NULL, " ");	//location id
+			char * err = strtok(NULL, " ");
+			bool err_flag = false;
+			if (err != NULL) err_flag = true;
+			if (location == NULL) err_flag = true;
+			if (!err_flag) {
+				AVLNode * flag = NULL;
+				if (flag = SEARCH_AVL(atoi(location))) {	//get node
+					flog << "==> command " << iter << ") " << one << endl;
+					avl->print_avl_node(flag);	//print node
+				}
+				else printErrorCode(500, one);	//print error 500
+				flog << endl;
+			}
+			else printErrorCode(500, one);	//print error 500
+			flog << endl;
+		}
+		else if (!strcmp(one, "DELETE_AVL")) {	//if command is DELETE_AVL
+			bool err_flag = false;
+			char * location = strtok(NULL, " ");
+			if (location == NULL) err_flag = true;
+			char * err = strtok(NULL, " ");
+			if (err != NULL) err_flag = true;
+			if (!err_flag) {
+				if (DELETE_AVL(atoi(location))) printSuccessCode(one);	//delete node
+				else printErrorCode(400, one);	//print error 400
+				flog << endl;
 			}
 			else printErrorCode(400, one);
 			flog << endl;
 		}
-		else if (!strcmp(one, "DELETE_AVL")) {	//if command is DELETE_AVL
-			int location = atoi(strtok(NULL, " "));	//location id
-			if (DELETE_AVL(location)) printSuccessCode(one);	//delete node
-			else printErrorCode(500, one);
-			flog << endl;
-		}
 		else if (!strcmp(one, "BUILD_GP")) {	//if command is BUILD_GP
-			if (BUILD_GP()) printSuccessCode(one);	//make graph
+			char * err = strtok(NULL, " ");
+			if (err != NULL) {
+				if (BUILD_GP()) printSuccessCode(one);	//make graph
+				else printErrorCode(600, one);	//print error 600
+				flog << endl;
+			}
 			else printErrorCode(600, one);
 			flog << endl;
 		}
 		else if (!strcmp(one, "PRINT_GP")) {	//if command is PRINT_GP
-			if (PRINT_GP()) {	//call PRINT_GP function
-				flog << "==> command " << iter << ") " << one << endl;
-				gp->Print_GP();	//print graph
+			char * err = strtok(NULL, " ");
+			if (err != NULL) {
+				if (PRINT_GP()) {	//call PRINT_GP function
+					flog << "==> command " << iter << ") " << one << endl;
+					gp->Print_GP();	//print graph
+				}
+				else printErrorCode(700, one);	//print error 700
+				flog << endl;
 			}
 			else printErrorCode(700, one);
 			flog << endl;
 		}
 		else if (!strcmp(one, "BUILD_MST")) {	//if command is BUILD_MST
-			if (BUILD_MST()) printSuccessCode(one);	//make minimum spanning tree
+			char * err = strtok(NULL, " ");
+			if (err != NULL) {
+				if (BUILD_MST()) printSuccessCode(one);	//make minimum spanning tree
+				else printErrorCode(800, one);	//print error 800
+				flog << endl;
+			}
 			else printErrorCode(800, one);
 			flog << endl;
 		}
 		else if (!strcmp(one, "PRINT_MST")) {	//if command is PRINT_MST
-			if (PRINT_MST()) {	//call PRINT_MST function
-				flog << "==> command " << iter << ") " << one << endl;
-				gp->Print_MST();	//print mst
+		char * err = strtok(NULL, " ");
+		if (err != NULL) {
+				if (PRINT_MST()) {	//call PRINT_MST function
+					flog << "==> command " << iter << ") " << one << endl;
+					gp->Print_MST();	//print mst
+				}
+				else printErrorCode(900, one);	//print error 900
+				flog << endl;
 			}
 			else printErrorCode(900, one);
 			flog << endl;
@@ -147,19 +188,17 @@ bool Manager::LOAD()
 // AVL insert Node
 bool Manager::INSERT(int location, char* city, char* country)
 {
-	CityData * city_data = new CityData();	//allocate new CityData
-	city_data->SetLocationId(location);	//set elements
-	city_data->Setname(city);
-	city_data->Setcountry(country);
 	if (avl->Getroot() == NULL) {	//if empty tree
-		AVLNode * pNew = new AVLNode();	//new node as root
-		pNew->SetCityData(city_data);
-		avl->Setroot(pNew);
+		return false;
 	}
 	else {	//else, AVL_insert
+		CityData * city_data = new CityData();	//allocate new CityData
+		city_data->SetLocationId(location);	//set elements
+		city_data->Setname(city);
+		city_data->Setcountry(country);
 		avl->Insert(city_data);
+		return true;
 	}
-	return true;
 }
 
 // Print AVL Tree

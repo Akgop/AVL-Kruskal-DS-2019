@@ -21,17 +21,17 @@ public:
 	Graph(ofstream * flog);
 	~Graph();
 
-	bool	Build(AVLTree * root);
-	void 	Print_GP();
-	void	Print_MST();
+	bool	Build(AVLTree * root);	//BUILD GP
+	void 	Print_GP();	//PRINT BP
+	void	Print_MST();	//PRINT MST
 
-	void	Set_AVL_Size(AVLTree * root);
-	int		Get_AVL_Size();
+	void	Set_AVL_Size(AVLTree * root);	//get AVLTree size from AVLTree
+	int		Get_AVL_Size();	//return AVLTree size
 	void	Inorder_AVL(AVLNode * t, CityData ** c, int &cnt);
-	int		Get_Distance(CityData* from, CityData* to);
+	int		Get_Distance(CityData* from, CityData* to);	//|a - b| = distance (weight)
 
-	void	find_path_mst();
-	void	Ascending_Edges();
+	void	find_path_mst();	//Print MST
+	void	Ascending_Edges();	//Sort Edges
 
 	/*for Kruskal union_set*/
 	bool	Kruskal();

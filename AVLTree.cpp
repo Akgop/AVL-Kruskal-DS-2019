@@ -1,26 +1,26 @@
 #include "AVLTree.h"
 
-AVLTree::AVLTree(ofstream * flog)
+AVLTree::AVLTree(ofstream * flog)	//constructor
 {
 	Setroot(NULL);
 	this->flog = flog;
 }
 
-AVLTree::~AVLTree()
+AVLTree::~AVLTree()	//destructor
 {
 }
 
-AVLNode * AVLTree::Getroot()
+AVLNode * AVLTree::Getroot()	//root
 {
 	return this->root;
 }
 
-void AVLTree::Setroot(AVLNode * node)
+void AVLTree::Setroot(AVLNode * node)	//set root
 {
 	this->root = node;
 }
 
-bool AVLTree::Insert(CityData * node)
+bool AVLTree::Insert(CityData * node)	//AVL Insertion
 {
 	AVLNode * pNew = new AVLNode();
 	pNew->SetCityData(node);
@@ -154,18 +154,18 @@ bool AVLTree::Insert(CityData * node)
 	return true;
 }
 
-bool AVLTree::Delete(int num)
+bool AVLTree::Delete(int num)	//AVL Deletion
 {
 	//
 	// #1. find target node to delete
 	//
-	AVLNode * pTemp = Search(num);
-	if (pTemp == NULL) return false;
+	AVLNode * pTemp = Search(num);	//call Search Function
+	if (pTemp == NULL) return false;	//not found
 	char cTemp[50];
-	strcpy(cTemp, pTemp->GetCityData()->Getname());
+	strcpy(cTemp, pTemp->GetCityData()->Getname());	//strcpy
 	AVLNode * pCur = Getroot(), *pParent = NULL;
 	while (pCur) {
-		if (pCur == pTemp) {
+		if (pCur == pTemp) {	//find delete target
 			break;
 		}
 		pParent = pCur;
@@ -223,17 +223,18 @@ bool AVLTree::Delete(int num)
 	queue<AVLNode *> q;
 	pCur = Getroot();
 	while (pCur) {
-		if (pCur->GetmBF() == 2 || pCur->GetmBF() == -2) {
+		if (pCur->GetmBF() == 2 || pCur->GetmBF() == -2) {	//if tree unbalanced
 			break;
 		}
 		if (pCur->GetLeft()) q.push(pCur->GetLeft());	//if left child exist, push left child to queue
-		if (pCur->GetRight()) q.push(pCur->GetRight());	//if right childe exist, push right child to queue
+		if (pCur->GetRight()) q.push(pCur->GetRight());	//if right child exist, push right child to queue
 		if (q.empty()) return true;	//tree still balanced
 		pCur = q.front();	q.pop();	//pcur = q.front.
 	}
 	// #3-2. Set A-Node, parent of A-Node
-	AVLNode *pA = pCur, *pB, *pC, *pA_parent = NULL, *rootSub = NULL;
-	if (pA != Getroot()) {
+	AVLNode *pA = pCur;	//set A node
+	AVLNode *pB, *pC, *pA_parent = NULL, *rootSub = NULL;
+	if (pA != Getroot()) {	//set A's parent node
 		pA_parent = Getroot();
 		while (pA_parent) {
 			if (pA_parent->GetLeft() == pA ||
@@ -253,7 +254,6 @@ bool AVLTree::Delete(int num)
 		if (pB->GetmBF() >= 0) {
 			pA->SetLeft(pB->GetRight());	//a->left = b->right
 			pB->SetRight(pA);		//b->right = a
-			pA->SetmBF(0);	pB->SetmBF(0);	//update bf
 			rootSub = pB;	//b is new root of the subtree
 		}
 		// LR Rotation
@@ -272,7 +272,6 @@ bool AVLTree::Delete(int num)
 		if (pB->GetmBF() <= 0) {
 			pA->SetRight(pB->GetLeft());	//a->right = b->left
 			pB->SetLeft(pA);	//b->left = a
-			pA->SetmBF(0);	pB->SetmBF(0);	//update balance factor
 			rootSub = pB;	//b is new root of subtree
 		}
 		// RL Rotation
@@ -288,14 +287,13 @@ bool AVLTree::Delete(int num)
 	if (pA_parent == NULL) this->root = rootSub;	//if pA was root, set rootSub as new root
 	else if (pA == pA_parent->GetLeft()) pA_parent->SetLeft(rootSub);	//if pA was leftchild, parent->left = rootSub
 	else pA_parent->SetRight(rootSub);	//if pA was rightchild, parent->right = rootSub
-	update_BF();
+	update_BF();	//update balance factor
 	return true;
 }
 
-AVLNode * AVLTree::Search(int num)
+AVLNode * AVLTree::Search(int num)	//AVL Search
 {
 	//Level Order Search
-	//avl is height balanced, so I used level order
 	queue<AVLNode *> q;	//declare queue
 	AVLNode * pCur = Getroot();	//start from root
 	while (pCur) {
@@ -309,7 +307,7 @@ AVLNode * AVLTree::Search(int num)
 	}
 }
 
-bool AVLTree::Print()
+bool AVLTree::Print()	//AVL Print flag
 {
 	AVLNode * pCur = this->root;
 	if (this->root != NULL) {
@@ -320,7 +318,7 @@ bool AVLTree::Print()
 	}
 }
 
-void AVLTree::Inorder_Traversal(AVLNode * t)
+void AVLTree::Inorder_Traversal(AVLNode * t)	//AVL Inorder workhorse
 {
 	//used in-order traversal to print all node bottom to top.
 	if (t != NULL) {
@@ -331,7 +329,7 @@ void AVLTree::Inorder_Traversal(AVLNode * t)
 	return;
 }
 
-void AVLTree::print_avl_node(AVLNode * t)
+void AVLTree::print_avl_node(AVLNode * t)	//Print AVLNode
 {
 	//write data at log.txt
 	*flog << "( " << t->GetCityData()->GetLocationId() << ", "
@@ -341,23 +339,23 @@ void AVLTree::print_avl_node(AVLNode * t)
 		<< t->GetmBF() << endl;
 }
 
-int AVLTree::get_height(AVLNode * t)
+int AVLTree::get_height(AVLNode * t)	//Get height of AVLNode
 {
 	if (t == NULL) {
 		return 0;
 	}
-	return 1 + max(get_height(t->GetLeft()), get_height(t->GetRight()));
+	return 1 + max(get_height(t->GetLeft()), get_height(t->GetRight()));	//recursive
 }
 
-void AVLTree::update_BF()
+void AVLTree::update_BF()	//Function for updating Balance factor
 {
-	queue<AVLNode *> q;
+	queue<AVLNode *> q;	//declare queue
 	AVLNode * pCur = Getroot();
 	int lh = 0, rh = 0;
 	while (pCur) {
-		lh = get_height(pCur->GetLeft());
+		lh = get_height(pCur->GetLeft());	//call height function
 		rh = get_height(pCur->GetRight());
-		pCur->SetmBF(lh - rh);
+		pCur->SetmBF(lh - rh);	//change balance factor
 		if (pCur->GetLeft()) q.push(pCur->GetLeft());	//if left child exist, push left child to queue
 		if (pCur->GetRight()) q.push(pCur->GetRight());	//if right childe exist, push right child to queue
 		if (q.empty()) break;	//cannot find, return null

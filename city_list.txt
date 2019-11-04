@@ -1,10 +1,4 @@
-1241	Chicago	USA
-2354	Paris	France
-1112	Roma	Italy
-9821	Athens	Greece
-1543	Seoul	Korea
-7485	Busan	Korea
-2132	Tokyo	Japan
-4873	NewYork	USA
-6542	LA	USA
-8590 	Hanoi	Vietnam
+4999	Chicago	USA
+5000	Athens	Greece
+5002	Busan	Korea
+5001	Tokyo	Japan

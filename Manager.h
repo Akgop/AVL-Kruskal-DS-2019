@@ -10,8 +10,8 @@ using namespace std;
 class Manager
 {
 public:
-	AVLTree * avl;
-	Graph * gp;
+	AVLTree * avl;	//avl
+	Graph * gp;	//gp
 
 	char * cmd;
 	int iter;
@@ -23,6 +23,7 @@ public:
 	ofstream flog;
 	ifstream fin;
 
+	//Command set
 	void run(const char * command);
 	bool LOAD();
 	bool INSERT(int location, char * city, char * country);

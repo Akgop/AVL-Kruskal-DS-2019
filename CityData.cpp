@@ -1,42 +1,42 @@
 #include "CityData.h"
 
-CityData::CityData()
+CityData::CityData()	//constructor
 {
-	LocationId = 0;
+	LocationId = 0;		//allocate citydata memory
 	name = new char[50];
 	country = new char[50];
 }
 
-CityData::~CityData()
+CityData::~CityData()	//destructor
 {
 }
 
-int CityData::GetLocationId()
+int CityData::GetLocationId()	//location id
 {
 	return this->LocationId;
 }
 
-char * CityData::Getname()
+char * CityData::Getname()	//city name
 {
 	return this->name;
 }
 
-char * CityData::Getcountry()
+char * CityData::Getcountry()	//city country
 {
 	return this->country;
 }
 
-void CityData::SetLocationId(int LocationId)
+void CityData::SetLocationId(int LocationId)	//set location id
 {
 	this->LocationId = LocationId;
 }
 
-void CityData::Setname(char * name)
+void CityData::Setname(char * name)	//set city name
 {
 	strcpy(this->name, name);
 }
 
-void CityData::Setcountry(char * country)
+void CityData::Setcountry(char * country)	//set country
 {
 	strcpy(this->country, country);
 }

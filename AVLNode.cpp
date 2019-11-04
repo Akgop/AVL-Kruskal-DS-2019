@@ -1,6 +1,6 @@
 #include "AVLNode.h"
 
-AVLNode::AVLNode()
+AVLNode::AVLNode()	//constructor
 {
 	this->pCityData = NULL;
 	this->pLeft = NULL;
@@ -8,46 +8,46 @@ AVLNode::AVLNode()
 	this->mBF = 0;
 }
 
-AVLNode::~AVLNode()
+AVLNode::~AVLNode()	//destructor
 {
 }
 
-CityData * AVLNode::GetCityData()
+CityData * AVLNode::GetCityData()	//getcitydata
 {
 	return this->pCityData;
 }
 
-AVLNode * AVLNode::GetLeft()
+AVLNode * AVLNode::GetLeft()	//left
 {
 	return this->pLeft;
 }
 
-AVLNode * AVLNode::GetRight()
+AVLNode * AVLNode::GetRight()	//right
 {
 	return this->pRight;
 }
 
-int AVLNode::GetmBF()
+int AVLNode::GetmBF()	//balance factor
 {
 	return this->mBF;
 }
 
-void AVLNode::SetCityData(CityData * node)
+void AVLNode::SetCityData(CityData * node)	//set citydata
 {
 	this->pCityData = node;
 }
 
-void AVLNode::SetLeft(AVLNode * node)
+void AVLNode::SetLeft(AVLNode * node)	//set left
 {
 	this->pLeft = node;
 }
 
-void AVLNode::SetRight(AVLNode * node)
+void AVLNode::SetRight(AVLNode * node)	//set right
 {
 	this->pRight = node;
 }
 
-void AVLNode::SetmBF(int n)
+void AVLNode::SetmBF(int n)	//set balance factor
 {
 	this->mBF = n;
 }
