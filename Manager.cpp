@@ -98,7 +98,7 @@ void Manager::run(const char * command)	//driver
 		}
 		else if (!strcmp(one, "BUILD_GP")) {	//if command is BUILD_GP
 			char * err = strtok(NULL, " ");
-			if (err != NULL) {
+			if (!err) {
 				if (BUILD_GP()) printSuccessCode(one);	//make graph
 				else printErrorCode(600, one);	//print error 600
 				flog << endl;
@@ -108,7 +108,7 @@ void Manager::run(const char * command)	//driver
 		}
 		else if (!strcmp(one, "PRINT_GP")) {	//if command is PRINT_GP
 			char * err = strtok(NULL, " ");
-			if (err != NULL) {
+			if (!err) {
 				if (PRINT_GP()) {	//call PRINT_GP function
 					flog << "==> command " << iter << ") " << one << endl;
 					gp->Print_GP();	//print graph
@@ -121,7 +121,7 @@ void Manager::run(const char * command)	//driver
 		}
 		else if (!strcmp(one, "BUILD_MST")) {	//if command is BUILD_MST
 			char * err = strtok(NULL, " ");
-			if (err != NULL) {
+			if (!err) {
 				if (BUILD_MST()) printSuccessCode(one);	//make minimum spanning tree
 				else printErrorCode(800, one);	//print error 800
 				flog << endl;
@@ -131,7 +131,7 @@ void Manager::run(const char * command)	//driver
 		}
 		else if (!strcmp(one, "PRINT_MST")) {	//if command is PRINT_MST
 		char * err = strtok(NULL, " ");
-		if (err != NULL) {
+		if (!err) {
 				if (PRINT_MST()) {	//call PRINT_MST function
 					flog << "==> command " << iter << ") " << one << endl;
 					gp->Print_MST();	//print mst

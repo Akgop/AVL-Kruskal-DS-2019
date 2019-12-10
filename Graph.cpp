@@ -68,7 +68,7 @@ void Graph::Print_GP()	//Print Graph
 			if (i == cnt) *flog << setw(6) << "0";	//node itself
 			else {
 				dist = Get_Distance(this->vertex[i], it->second);	//get distance
-				*flog << setw(3) << dist;
+				*flog << setw(6) << dist;
 				it++;
 			}
 			cnt++;

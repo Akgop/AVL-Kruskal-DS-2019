@@ -305,6 +305,7 @@ AVLNode * AVLTree::Search(int num)	//AVL Search
 		if (q.empty()) return NULL;	//cannot find, return null
 		pCur = q.front();	q.pop();	//pcur = q.front.
 	}
+	return NULL;
 }
 
 bool AVLTree::Print()	//AVL Print flag
@@ -334,9 +335,7 @@ void AVLTree::print_avl_node(AVLNode * t)	//Print AVLNode
 	//write data at log.txt
 	*flog << "( " << t->GetCityData()->GetLocationId() << ", "
 		<< t->GetCityData()->Getname() << ", "
-		<< t->GetCityData()->Getcountry() << " )"
-		<< " BF : "
-		<< t->GetmBF() << endl;
+		<< t->GetCityData()->Getcountry() << " )" << endl;
 }
 
 int AVLTree::get_height(AVLNode * t)	//Get height of AVLNode
