@@ -1,4 +1,0 @@
-4999	Chicago	USA
-5000	Athens	Greece
-5002	Busan	Korea
-5001	Tokyo	Japan
